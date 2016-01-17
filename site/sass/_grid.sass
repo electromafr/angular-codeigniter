@@ -1,0 +1,37 @@
+$grid-gutter: 1rem
+$grid-columns: 12
+
+/* Containers for fluid, full width layouts */
+.o-container--fw 
+	+container-fixed
+
+%grid_base
+	position: relative
+	float: left
+	min-height: 1px
+	padding-left:  ($grid-gutter / 2)
+	padding-right: ($grid-gutter / 2)
+
+.g-row
+	position: relative
+	margin-right: -$grid-gutter/2
+	margin-left: -$grid-gutter/2
+	+clearfix
+
+//** Grid framework 
+@for $i from 1 through length($queries_map)	
+	$bp: nth(nth($queries_map, $i), 1)
+	@for $i from 1 through $grid-columns
+		.g-#{$bp}-#{$i}
+			@extend %grid_base
+			+breakpoint($bp)
+				width: percentage(($i / $grid-columns))
+		.g-#{$bp}-offset-#{$i}
+			+breakpoint($bp)
+				margin-left: percentage(($i / $grid-columns))
+		.g-#{$bp}-push-#{$i}
+			+breakpoint($bp)
+				left: percentage(($i / $grid-columns))
+		.g-#{$bp}-pull-#{$i}
+			+breakpoint($bp)
+				right: percentage(($i / $grid-columns))

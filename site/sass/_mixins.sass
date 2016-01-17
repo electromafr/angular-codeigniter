@@ -1,0 +1,244 @@
+/**************************************
+/*	Vendor mixin
+/*************************************/
+=vendor($property, $args...)
+	@each $vendor in ('-webkit-', '-moz-', '-ms-', '-o-', '') 
+		$out: null
+		@each $arg in nth($args, 1) 
+			$out: ($out, vendor-args($arg, $vendor))
+			#{$vendor}#{$property}: $out
+
+/**************************************
+/*	Box-shadow
+/*  Args: $shadow -> shadow property
+/*************************************/
+=box-shadow($shadow...)
+	+vendor(box-shadow, $shadow)
+
+/**************************************
+/*	Box-sizing
+/*  Args: $boxmodel -> boxmodel property
+/*************************************/
+=box-sizing($boxmodel)
+	+vendor(box-sizing, $boxmodel)
+
+/**************************************
+/*	Clearfix
+/*************************************/
+=clearfix()
+	&:before, &:after 
+		content: " "
+		display: table
+	&:after 
+		clear: both
+
+/**************************************
+/*	Background-image:
+/* 	Args: $url 		-> image url
+/*		  $position -> background-position (default: center center)
+/*		  $size		-> background-size (default: 100% auto)
+/*		  $repeat	-> background-srepeatize (default: no-repeat)
+/*************************************/
+=bg-img($url, $position: center center, $size: 100% auto, $repeat: no-repeat)		
+	background-image: url($url)
+	background-position: $position
+	background-size: $size
+	background-repeat: $repeat
+
+/**************************************
+/*	Inline-block:
+/* 	Args: $v-align -> vertical-align property (default: middle)
+/*************************************/
+=inline-block($v-align: middle)
+	display: inline-block
+	vertical-align: $v-align
+
+
+/**************************************
+/*	User-select:
+/* 	Args: $select -> user-select property
+/*************************************/
+=user-select($select)
+	+vendor(user-select, $select)
+
+
+/**************************************
+/*	Transition rules:
+/* 	Return prefixed transition
+/*		- transition
+/*		- transition-property (default: all)
+/*		- transition-delay (default: 0s)
+/*		- transition-duration (default: 0.5s)
+/*		- transition-timing-function (default: ease)
+/*************************************/
+=transition($transition...) 
+	+vendor(transition, $transition)
+
+=transition-property($transition-property...) 
+	+vendor(transition-property, $transition-property)
+
+=transition-delay($transition-delay) 
+	+vendor(transition-delay, $transition-delay)
+
+=transition-duration($transition-duration...) 
+	+vendor(transition-duration, $transition-duration)
+
+=transition-timing-function($timing-function) 
+	+vendor(transition-timing-function, $timing-function)
+
+=default-transition() 
+	+transition-property($default-transition-property) 
+	+transition-delay($default-transition-delay) 
+	+transition-duration($default-transition-duration) 
+	+transition-timing-function($default-transition-timing-function) 
+
+/**************************************
+/*	Transformations rules:
+/* 	Return prefixed transformations
+/*		- scale, scaleX, scaleY
+/*		- skew, skewX, skewY
+/*		- skew, skewX, skewY
+/*		- translate, translateX, translateY, translateZ, translate3d
+/*		- rotate, rotateX, rotateY, rotateZ, rotate3d
+/*		- perspective
+/*		- transform-origin
+/*************************************/
+
+=scale($ratio...) 
+	+vendor(transform, scale($ratio))
+
+=scaleX($ratio) 
+	+vendor(transform, scaleX($ratio))
+
+=scaleY($ratio) 
+	+vendor(transform, scaleY($ratio))
+
+=skew($x, $y) 
+	+vendor(transform, skewX($x) skewY($y))
+
+=skewX($value) 
+	+vendor(transform, skewX($value))
+
+=skewY($value) 
+	+vendor(transform, skewY($value))
+	
+=translate($x, $y) 
+	+vendor(transform, translate($x, $y))
+
+=translateX($x) 
+	+vendor(transform, translateX($x))
+
+=translateY($y) 
+	+vendor(transform, translateX($y))	
+
+=translateZ($z) 
+	+vendor(transform, translateX($z))			
+
+=translate3d($x, $y, $z) 
+	+vendor(transform, translate3d($x, $y, $z))			
+
+=rotate($degrees) 
+	+vendor(transform, rotate($degrees))			
+
+=rotateX($degrees) 
+	+vendor(transform, rotateX($degrees))			
+
+=rotateY($degrees) 
+	+vendor(transform, rotateY($degrees))			
+
+=rotateZ($degrees) 
+	+vendor(transform, rotateZ($degrees))			
+
+=rotate3d($x, $y, $z) 
+	+vendor(transform, rotate3d($x, $y, $z))				
+
+=transform-origin($origin) 
+	+vendor(transform-origin, $origin)	
+
+/**************************************
+/*	Placeholder color:
+/*************************************/
+=placeholder($color: $black) 
+	// Firefox
+	&::-moz-placeholder 
+		color: $color
+		opacity: 1
+	&:-ms-input-placeholder
+		color: $color // Internet Explorer 10+
+	&::-webkit-input-placeholder
+		color: $color // Safari and Chrome
+
+/**************************************
+/*	Size, square and rect:
+/*  The ratio for rect mixin sould be between 0 & 1
+/*************************************/
+=size($width, $height)
+	width: $width
+	height: $height
+
+=square($size)
+	@include size($size, $size)
+
+=rect($size, $ratio)
+	@if $ratio > 0 and $ratio < 1 
+		@include size($size, $size*$ratio)
+	@else
+		@error "Ratio has to be between 0 & 1"
+
+/**************************************
+/*	Center containers elements
+/*************************************/
+=container-fixed($gutter: $grid-gutter)
+	margin-right: auto
+	margin-left: auto
+	padding-left:  ($gutter / 2)
+	padding-right: ($gutter / 2)
+	position: relative
+	+clearfix	
+
+/**************************************
+/*	create breakpoints, return max-width for the smallest size and min-width for the others
+/*************************************/
+=breakpoint($value)
+	@if map-has-key($queries_map, $value) 
+		$media: map-get($queries_map, $value)	
+		@if index(map-keys($queries_map), $value) != 1
+			@media (min-width: #{$media})
+				@content
+		@else
+			@content
+	@else
+		@media (min-width: $value)
+			@content			
+
+/**************************************
+/*	Return color based on map_colors values
+/*************************************/				
+=color($color)
+	color: map-get($colors_map, $color)
+
+/**************************************
+/*	Return background-color based on map_colors values
+/*************************************/	
+=background-color($color)
+	background-color: map-get($colors_map, $color)
+
+/**************************************
+/*	Box shadow cards (based on material design)
+/*************************************/	
+=box-shadow-card($level)
+	@if $level == 1
+		+box-shadow(0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24))
+	@else if $level == 2
+		+box-shadow(0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23))
+	@else if $level == 3
+		+box-shadow(0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23))
+	@else if $level == 4
+		+box-shadow(0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22))
+	@else if $level == 5
+		+box-shadow(0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22))
+	@else
+		@warn 'This level of shadow is not supported'
+
+
+

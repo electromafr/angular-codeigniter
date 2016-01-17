@@ -1,0 +1,15 @@
+// loops through all arguments and prefixes the ones that need it (in this case only transform)
+@function vendor-args($arg, $vendor) 
+	$result: ()
+	@each $i in $arg
+		@if $i == transform
+			$result: append($result, #{$vendor}$i)
+		@else
+			$result: append($result, $i)
+	@return $result
+
+@function color($color)
+	@return map-get($colors_map, $color)
+
+
+	
